@@ -25,19 +25,23 @@ pkg_preinst() {
 basedirs="/opt/smfp-common/printer"
 dodir /$basedirs/{bin,lib}
 
-cp -a uld/x86_64/smfpnetdiscovery $basedirs/bin
-cp -a uld/x86_64/rastertospl $basedirs/bin
-cp -a uld/x86_64/pstosecps $basedirs/bin
-cp -a uld/x86_64/libscmssc.so $basedirs/lib
+for i in smfpnetdiscovery \
+        rastertospl \
+        pstosecps \
+do
+        cp -a uld/x86_64/$i  $basedirs/bin/$i
+done || die
+
+cp -a uld/x86_64/libscmssc.so $basedirs/lib/ || die
 
 cp -a noarch/share/ppd/cms /usr/share/ppd/HP/
 
-for ppd in        HP_Color_Laser_15x_Series.ppd \
+for ppd in      HP_Color_Laser_15x_Series.ppd \
                 HP_Color_Laser_MFP_17x_Series.ppd \
                 HP_Laser_10x_Series.ppd
 do
         gzip -c noarch/share/ppd/$ppd > /usr/share/ppd/HP/$ppd.gz
-done
+done || die
 
 ln -s $basedirs/bin/smfpnetdiscovery /usr/libexec/cups/backend/
 ln -s $basedirs/bin/pstosecps /usr/libexec/cups/filter/
