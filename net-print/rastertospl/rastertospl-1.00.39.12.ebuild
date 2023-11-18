@@ -21,12 +21,12 @@ src_unpack() 	{
 pkg_preinst() 	{
 set -e
 ppd_dir="/usr/share/ppd/HP"
-mkdir -p /usr/share/ppd/HP
+mkdir -p $ppd_dir
 
 for binary in smfpnetdiscovery rastertospl pstosecps
 do
     dobin ${S}/x86_64/$binary
-done || die
+done
 
 dolib.so ${S}/x86_64/libscmssc.so
 
@@ -34,10 +34,11 @@ cp -a ${S}/noarch/share/ppd/cms/ $ppd_dir
 
 for ppd in      HP_Color_Laser_15x_Series.ppd \
                 HP_Color_Laser_MFP_17x_Series.ppd \
-                HP_Laser_10x_Series.ppd
+                HP_Laser_10x_Series.ppd \
+		HP_Laser_MFP_13x_Series.ppd
 do
     gzip -c ${S}/noarch/share/ppd/$ppd > /usr/share/ppd/HP/$ppd.gz
-done || die
+done
 
 dosym -r /usr/bin/smfpnetdiscovery /usr/libexec/cups/backend/smfpnetdiscovery
 dosym -r /usr/bin/pstosecps /usr/libexec/cups/filter/pstosecps
