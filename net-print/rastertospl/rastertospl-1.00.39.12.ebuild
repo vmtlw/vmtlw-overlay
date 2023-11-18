@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-DESCRIPTION="hello"
+DESCRIPTION=""
 HOMEPAGE="https://ftp.hp.com"
 SRC_URI="https://ftp.hp.com/pub/softlib/software13/printers/CLP150/uld-hp_V1.00.39.12_00.15.tar.gz -> ${P}.tar.gz"
 
@@ -13,30 +13,24 @@ KEYWORDS="~amd64"
 DEPEND="net-print/cups"
 RDEPEND="${DEPEND}"
 BDEPEND=""
-S="/var/calculate/tmp/portage/net-print/rastertospl-1.00.39.12/work/uld"
-src_unpack() {
-    if [[ -n ${P}.tar.gz ]]; then
-        unpack ${P}.tar.gz
-    fi
-}
+S="$WORKDIR/uld"
+src_unpack() 	{
+     [[ ! -n ${P}.tar.gz ]] ||  unpack ${P}.tar.gz
+		}
 
-pkg_preinst() {
+pkg_preinst() 	{
+set -e
+ppd_dir="/usr/share/ppd/HP"
+mkdir -p /usr/share/ppd/HP
 
-basedirs="/opt/smfp-common/printer"
-mkdir -p $basedirs/{bin,lib}
-
-for i in smfpnetdiscovery \
-    rastertospl \
-    pstosecps
+for binary in smfpnetdiscovery rastertospl pstosecps
 do
-        echo ------------ ${PWD}/$i
-    cp -a ${S}/x86_64/$i  $basedirs/bin/$i
+    dobin ${S}/x86_64/$binary
 done || die
 
-cp -a ${S}/x86_64/libscmssc.so $basedirs/lib/ || die
+dolib.so ${S}/x86_64/libscmssc.so
 
-mkdir -p /usr/share/ppd/HP/
-cp -a ${S}/noarch/share/ppd/cms /usr/share/ppd/HP/
+cp -a ${S}/noarch/share/ppd/cms/ $ppd_dir
 
 for ppd in      HP_Color_Laser_15x_Series.ppd \
                 HP_Color_Laser_MFP_17x_Series.ppd \
@@ -45,8 +39,8 @@ do
     gzip -c ${S}/noarch/share/ppd/$ppd > /usr/share/ppd/HP/$ppd.gz
 done || die
 
-ln -s $basedirs/bin/smfpnetdiscovery /usr/libexec/cups/backend/smfpnetdiscovery
-ln -s $basedirs/bin/pstosecps /usr/libexec/cups/filter/pstosecps
-ln -s $basedirs/bin/rastertospl /usr/libexec/cups/filter/rastertospl
+dosym -r /usr/bin/smfpnetdiscovery /usr/libexec/cups/backend/smfpnetdiscovery
+dosym -r /usr/bin/pstosecps /usr/libexec/cups/filter/pstosecps
+dosym -r /usr/bin/rastertospl /usr/libexec/cups/filter/rastertospl
 
-}
+		}
