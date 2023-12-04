@@ -10,4 +10,8 @@ Add custom repository:
 eselect repository add vmtlw-overlay git https://github.com/vmtlw/vmtlw-overlay.git
 ```
 
-Check result by run ```eix net-print/rastertospl``` package from this repo.
+Check result by run 
+
+```
+eix-sync && eix-update && net-print/rastertospl
+```
